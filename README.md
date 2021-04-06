@@ -1,5 +1,5 @@
 # 3dme
-3dme made for OneSync Infinity with pma-voice proximity support
+3dme made for OneSync with pma-voice proximity support
 
 ## Support
 
