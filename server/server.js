@@ -45,12 +45,14 @@ RegisterCommand('me', (source, args) => {
 		// make sure they're not on cooldown (they could try spamming the command)
 		if (!meCooldown[source] || meCooldown[source] < GetGameTimer()) {
 			meCooldown[source] = GetConvarInt('3dme_cooldown', 1500) + GetGameTimer()
-			// useful for logging
-			emit('3dme:sent3dme', source, message)
 
 			// enable support for pma-voice, if the player has toggled it.
 			const proximity = Player(source).state.proximity * (GetConvar('voice_useNativeAudio', 'false') === 'true' && 3 || 1)
 			if (GetConvarInt('3dme_enableProximity', 0) && Math.floor(proximity) > GetConvarInt('3dme_maxRange', 25)) return emit('3dme:voiceRangeExploit', source)
+
+			// useful for logging
+			emit('3dme:sent3dme', source, message)
+
 
 			const plyCoords = GetEntityCoords(GetPlayerPed(source))
 			const players = getPlayers()
