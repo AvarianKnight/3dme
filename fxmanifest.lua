@@ -1,6 +1,8 @@
 fx_version 'adamant'
 game 'gta5'
 
+lua54 'yes'
+
 author 'Avarian Knight'
 description '/me with word filtering & OneSync Infinity support'
 version '1.0'

@@ -16,7 +16,36 @@ function Draw3DText(coords, str)
     end
 end
 
-local tags = {}
+local displayCount = {}
+local currentDisplaying = {}
+local sleepUntil3dMe = promise.new()
+CreateThread(function()
+    while true do
+        Citizen.Await(sleepUntil3dMe)
+        local plyPed = PlayerPedId()
+        local tblLength = #currentDisplaying
+        local displayOccurance = {}
+        for i = tblLength, 1, -1 do 
+            local display = currentDisplaying[i]
+            displayOccurance[display.ply] = displayOccurance[display.ply] or 0
+            displayOccurance[display.ply] += 1
+            local tgtPed = GetPlayerPed(display.ply)
+            local hasLos = HasEntityClearLosToEntity(plyPed, tgtPed, 13)
+            local tgtCoords = GetEntityCoords(tgtPed)
+            if hasLos then
+                Draw3DText(tgtCoords + vector3(0, 0, 0.90 + (0.10 * displayOccurance[display.ply])), display.text)
+            end
+            if display.displayTime < GetGameTimer() then
+                table.remove(currentDisplaying, i)
+            end
+        end
+        if tblLength == 0 then
+            sleepUntil3dMe = promise.new()
+        end
+        Wait(0)
+    end
+end)
+
 local plyNetId = GetPlayerServerId(PlayerId())
 RegisterNetEvent('3dme:show3dme', function(serverId, text)
 	local tgtPly = GetPlayerFromServerId(serverId)
@@ -26,25 +55,11 @@ RegisterNetEvent('3dme:show3dme', function(serverId, text)
 				args = {text}
 			})
 		end
-
-		if GetConvarInt('3dme_useGamertags', 0) == 1 then
-			if tags[serverId] then
-				RemoveMpGamerTag(tags[serverId])
-				Wait(50)
-			end
-			tags[serverId] = CreateFakeMpGamerTag(GetPlayerPed(tgtPly), text, false, false, "", false)
-			Wait(GetConvarInt('3dme_displayTime', 10000))
-			RemoveMpGamerTag(tags[serverId])
-		else
-			CreateThread(function()
-				local displayTime = GetConvarInt('3dme_displayTime', 10000) + GetGameTimer()
-				while displayTime > GetGameTimer() do
-					local tgtPed = GetPlayerPed(tgtPly)
-					local tgtCoords = GetEntityCoords(tgtPed)
-					Draw3DText(tgtCoords + vector3(0, 0, 1.0), text)
-					Wait(0)
-				end
-			end)
-		end
+        currentDisplaying[#currentDisplaying + 1] = {
+            displayTime = GetConvarInt('3dme_displayTime', 10000) + GetGameTimer(),
+            ply = tgtPly,
+            text = text
+        }
+        sleepUntil3dMe:resolve()
 	end
 end)
