@@ -21,7 +21,6 @@ The ints are used like a boolean to 0 would be false, 1 true.
 | 3dme_enableProximity    | 0       | Enables proximity support for pma-voice    | int          |
 | 3dme_maxRange           | 25      | The max range for /me to travel            | int          |
 | 3dme_showChatMessage    | 1       | Enabled showing /me into chat              | int          |
-| 3dme_useGamertags       | 1       | Uses the players gamer tag to show the text above their head (improves performance but breaks anything else that uses gamer tags) | int          |
 
 
 #### Server
